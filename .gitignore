@@ -3,6 +3,7 @@ auxilliaries
 
 # Secrets
 secrets.yaml
+secrets
 
 # Development environments
 .vim
