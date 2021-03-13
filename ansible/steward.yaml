@@ -47,46 +47,44 @@
         chdir: "{{ proj_dir }}"
         cmd: 'poetry install --no-dev'
 
-    # - name: Copy caddy config
-    #   become: true
-    #   ansible.builtin.copy:
-    #     backup: yes
-    #     dest: '/etc/caddy/Caddyfile'
-    #     src: 'configs/Caddyfile'
-    #     group: 'root'
-    #     owner: 'root'
-    #     mode:  0644
+    - name: Copy caddy config
+      become: true
+      ansible.builtin.copy:
+        backup: yes
+        dest: '/etc/caddy/Caddyfile'
+        src: 'configs/Caddyfile'
+        group: 'root'
+        owner: 'root'
+        mode:  0644
 
-    # - name: Add caddy to group sudo_user
-    #   become: true
-    #   user:
-    #     name: caddy
-    #     state: present
-    #     groups: "{{ sudo_user }}"
-    #     append: true
+    - name: Add caddy to group sudo_user
+      become: true
+      user:
+        name: caddy
+        state: present
+        groups: "{{ sudo_user }}"
+        append: true
 
-    # - name: Copy python-webserver service
-    #   become: true
-    #   ansible.builtin.copy:
-    #     backup: yes
-    #     dest: '/etc/systemd/system'
-    #     src: 'configs/aulon-web.service'
-    #     group: 'root'
-    #     owner: 'root'
-    #     mode:  0644
+    # In the future, create a systemd service to create a dir in run on boot for the application
+    - name: Copy services
+      become: true
+      ansible.posix.synchronize:
+        checksum: true
+        dest: '/etc/systemd/system'
+        src: 'configs/systemd/'
 
-    # - name: Reload systemd daemon
-    #   become: true
-    #   ansible.builtin.systemd:
-    #     daemon_reload: true
+    - name: Reload systemd daemon
+      become: true
+      ansible.builtin.systemd:
+        daemon_reload: true
         
-    # - name: Enable webservers
-    #   become: true
-    #   ansible.builtin.systemd:
-    #     name: "{{ item }}"
-    #     state: restarted
-    #     enabled: yes
-    #   loop:
-    #     - 'caddy'
-    #     - 'aulon-web'
+    - name: Enable webservers
+      become: true
+      ansible.builtin.systemd:
+        name: "{{ item }}"
+        state: restarted
+        enabled: yes
+      loop:
+        - 'caddy'
+        - 'aulon-web'
 
