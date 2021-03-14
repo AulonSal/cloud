@@ -10,7 +10,6 @@ all_users: [
 # Found using infocmp -D
 terminfo_dir: '/usr/share/terminfo'
 
-# generated with python -c "import crypt; print(crypt.crypt('*password*'))"
 copy_local_key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
 
 sys_packages: [
@@ -24,6 +23,7 @@ sys_packages: [
         'man-pages',
         'texinfo',
         'htop',
+        'sqlite',
 
         'fish',
         'ranger',

@@ -1,0 +1,12 @@
+[Unit]
+Description=ASGI application-server instance to serve steward
+After=network.target
+
+[Service]
+User=aulonsal
+Group=caddy
+WorkingDirectory=/home/aulonsal/steward-fastapi/steward_fastapi
+ExecStart=poetry run python run_prod.py
+
+[Install]
+WantedBy=multi-user.target

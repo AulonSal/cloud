@@ -6,8 +6,24 @@
     - vars/secrets.yaml
 
   tasks:
+    - name: Set timezone
+      community.general.timezone:
+        name: 'Asia/Kolkata'
+
+    - name: Upgrade system
+      pacman:
+        upgrade: true
+        update_cache: true
+      register: system_update
+
+    - name: Reboot system if updated
+      reboot:
+      when: system_update.changed
+
     - name: Install Packages
-      pacman: name={{ sys_packages }} state=latest
+      pacman:
+        name: "{{ sys_packages }}"
+        state: latest
 
 # Sudo Group Setup
     - name: Make sure we have a 'wheel' group
@@ -20,7 +36,8 @@
         path: /etc/sudoers
         state: present
         regexp: '^%wheel'
-        line: '%wheel ALL=(ALL) ALL'
+        line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+        # line: '%wheel ALL=(ALL) ALL'
         insertafter: '## Uncomment to allow members of group wheel to execute any command'
         validate: '/usr/sbin/visudo -cf %s'
 
@@ -35,7 +52,13 @@
         shell: /bin/zsh
         password: "{{ sudo_user_password_hash }}"
 
-    - name: Have arch's shell be zsh
+    - name: Allow groups to execute in home directory
+      ansible.builtin.file:
+        path: "/home/{{ sudo_user }}"
+        state: directory
+        mode: '0710'
+
+    - name: "Have arch's shell be zsh"
       user:
         name: "{{ initial_user }}"
         state: present
@@ -48,7 +71,7 @@
         key: "{{ copy_local_key }}"
 
     - name: Copy zshrc for all users
-      copy:
+      ansible.builtin.copy:
         backup: yes
         dest: "/home/{{ item }}/.zshrc"
         src: 'configs/zshrc'
@@ -61,14 +84,30 @@
         - "{{ sudo_user }}"
         - "{{ initial_user }}"
 
-    - name: Copy kitty terminfo to remote system
-      copy:
+    - name: Copy gitconfig
+      ansible.builtin.copy:
+        dest: "/home/{{ sudo_user }}/.gitconfig"
+        src: 'configs/gitconfig'
+        group: "{{ sudo_user }}"
+        owner: "{{ sudo_user }}"
+        mode:  0644
+
+    - name: Copy kitty terminfo to server
+      ansible.builtin.copy:
         dest: "{{ terminfo_dir }}"
         src: '/usr/lib/kitty/terminfo/'
         group: 'root'
         owner: 'root'
         mode:  'preserve'
 
+    - name: Copy ssh keys to server
+      ansible.builtin.copy:
+        dest: "{{ ssh_home }}/"
+        src: '{{ item }}'
+        group: '{{ sudo_user }}'
+        owner: '{{ sudo_user }}'
+        mode:  'preserve'
+      loop: "{{ ssh_files }}"
 
     # - name: Disable password authentication for root
     #   lineinfile:

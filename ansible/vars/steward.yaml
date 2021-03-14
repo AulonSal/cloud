@@ -2,5 +2,13 @@
 packages: [
         'poetry',
         'caddy',
+        'postgresql',
         ]
+
+git_uri: 'git@github.com:AulonSal/steward-fastapi.git'
+proj_dir: '~/steward-fastapi'
+w_dir: "{{ proj_dir }}/steward_fastapi"
+local_proj_dir: '/home/aulonsal/developer/projects/active/steward-fastapi'
+dist_dir: "{{ local_proj_dir }}/dist"
+env_dir: "{{ local_proj_dir }}/env"
 

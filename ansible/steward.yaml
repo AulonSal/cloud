@@ -1,21 +1,92 @@
 # Deployment of steward
 ---
 - hosts: aws-deploy
-  become: true
+  become: false
   vars_files:
+    - vars/default.yaml
     - vars/steward.yaml
+    - vars/secrets.yaml
 
   tasks:
-    - name: Install Packages
+    - name: Install packages
+      become: true
       pacman: name={{ packages }} state=latest
+
+    - name: Checkout steward
+      ansible.builtin.git:
+        repo: "{{ git_uri }}"
+        dest: '~/steward-fastapi'
+        accept_hostkey: true
+
+    - name: Copy custom aerich to server
+      ansible.builtin.copy:
+        dest: "{{ proj_dir }}"
+        src: "{{ dist_dir }}"
+        group: "{{ sudo_user }}"
+        owner: "{{ sudo_user }}"
+        mode:  'preserve'
+
+    - name: Copy steward prod only directory contents
+      ansible.posix.synchronize:
+        checksum: true
+        dest: "{{ w_dir }}"
+        src: 'configs/steward/'
+      tags:
+        - project_setup
+
+    - name: Create project instance dir
+      ansible.builtin.file:
+        path: "{{ proj_dir }}/instance"
+        state: directory
+        mode: '0755'
+      tags:
+        - project_setup
+
+    - name: Install poetry environment
+      ansible.builtin.command:
+        chdir: "{{ proj_dir }}"
+        cmd: 'poetry install --no-dev'
+
+    # - name: Copy caddy config
+    #   become: true
+    #   ansible.builtin.copy:
+    #     backup: yes
+    #     dest: '/etc/caddy/Caddyfile'
+    #     src: 'configs/Caddyfile'
+    #     group: 'root'
+    #     owner: 'root'
+    #     mode:  0644
+
+    # - name: Add caddy to group sudo_user
+    #   become: true
+    #   user:
+    #     name: caddy
+    #     state: present
+    #     groups: "{{ sudo_user }}"
+    #     append: true
+
+    # - name: Copy python-webserver service
+    #   become: true
+    #   ansible.builtin.copy:
+    #     backup: yes
+    #     dest: '/etc/systemd/system'
+    #     src: 'configs/aulon-web.service'
+    #     group: 'root'
+    #     owner: 'root'
+    #     mode:  0644
+
+    # - name: Reload systemd daemon
+    #   become: true
+    #   ansible.builtin.systemd:
+    #     daemon_reload: true
         
-    - name: Copy caddy config
-      copy:
-        backup: yes
-        dest: '/etc/caddy/Caddyfile'
-        src: 'configs/Caddyfile'
-        group: 'root'
-        owner: 'root'
-        mode:  0644
-        validate: 'caddy validate %s'
+    # - name: Enable webservers
+    #   become: true
+    #   ansible.builtin.systemd:
+    #     name: "{{ item }}"
+    #     state: restarted
+    #     enabled: yes
+    #   loop:
+    #     - 'caddy'
+    #     - 'aulon-web'
 
