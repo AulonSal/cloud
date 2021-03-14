@@ -11,7 +11,7 @@
   tasks:
     - name: Set timezone
       community.general.timezone:
-        name: 'Asia/Kolkata'
+        name: "{{ timezone }}"
 
     - name: Upgrade system
       pacman:

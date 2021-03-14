@@ -6,6 +6,7 @@ all_users: [
         "{{ initial_user }}",
         'root',
         ]
+timezone: 'Asia/Kolkata'
 
 # Found using infocmp -D
 terminfo_directory: '/usr/share/terminfo'
