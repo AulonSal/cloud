@@ -5,10 +5,14 @@ packages: [
         'postgresql',
         ]
 
+# Paths
+# Remote
 git_uri: 'git@github.com:AulonSal/steward-fastapi.git'
-proj_dir: '~/steward-fastapi'
-w_dir: "{{ proj_dir }}/steward_fastapi"
-local_proj_dir: '/home/aulonsal/developer/projects/active/steward-fastapi'
-dist_dir: "{{ local_proj_dir }}/dist"
-env_dir: "{{ local_proj_dir }}/env"
+steward_directory: '/home/aulonsal/steward-fastapi'
+steward_working_directory: "{{ steward_directory }}/steward_fastapi"
+steward_socket_path: "{{ steward_directory }}/web.sock"
+
+# Local
+local_steward_directory: '/home/aulonsal/developer/projects/active/steward-fastapi'
+python_distributables_directory: "{{ local_project_directory }}/dist"
 

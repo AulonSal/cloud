@@ -1,9 +1,12 @@
 ---
 - hosts: aws-setup
   become: true
+
+
   vars_files:
     - vars/default.yaml
     - vars/secrets.yaml
+    - vars/steward.yaml
 
   tasks:
     - name: Set timezone

@@ -8,7 +8,7 @@ all_users: [
         ]
 
 # Found using infocmp -D
-terminfo_dir: '/usr/share/terminfo'
+terminfo_directory: '/usr/share/terminfo'
 
 copy_local_key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
 
@@ -33,3 +33,8 @@ sys_packages: [
         'skim',
         'nmap',
         ]
+
+ansible_directory: '/home/aulonsal/developer/deployments/active/cloud/ansible'
+files_directory: '{{ ansible_directory }}/files'
+templates_directory: "templates"
+

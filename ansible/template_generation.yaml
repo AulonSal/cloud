@@ -1,0 +1,26 @@
+---
+- hosts: 'localhost'
+
+  vars_files:
+    - vars/default.yaml
+    - vars/secrets.yaml
+    - vars/steward.yaml
+
+  tasks:
+    - name: Ensure files directory structure exists
+      ansible.builtin.file:
+        state: directory
+        dest: "{{ files_directory }}/{{ item.path }}"
+      with_community.general.filetree: "{{ templates_directory }}/"
+      when: item.state == 'directory'
+
+    - name: Template files (explicitly skip directories in order to use the 'src' attribute)
+      ansible.builtin.template:
+        src: "{{ item.src }}"
+        dest: "{{ files_directory }}/{{ item.path }}"
+        mode: '{{ item.mode }}'
+      # This command doesn't work without the trailing slash but the one in the first task does, except
+      # for that one time that it didn't, go figure *shrugs*
+      with_community.general.filetree: "{{ templates_directory }}/"
+      when: item.state == 'file'
+          

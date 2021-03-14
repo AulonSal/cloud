@@ -20,8 +20,8 @@
 
     - name: Copy custom aerich to server
       ansible.builtin.copy:
-        dest: "{{ proj_dir }}"
-        src: "{{ dist_dir }}"
+        dest: "{{ steward_directory }}"
+        src: "{{ python_distributables_directory }}"
         group: "{{ sudo_user }}"
         owner: "{{ sudo_user }}"
         mode:  'preserve'
@@ -29,22 +29,22 @@
     - name: Copy steward prod only directory contents
       ansible.posix.synchronize:
         checksum: true
-        dest: "{{ w_dir }}"
+        dest: "{{ steward_working_directory }}"
         src: 'configs/steward/'
       tags:
-        - project_setup
+        - steward_setup
 
     - name: Create project instance dir
       ansible.builtin.file:
-        path: "{{ proj_dir }}/instance"
+        path: "{{ steward_directory }}/instance"
         state: directory
         mode: '0755'
       tags:
-        - project_setup
+        - steward_setup
 
     - name: Install poetry environment
       ansible.builtin.command:
-        chdir: "{{ proj_dir }}"
+        chdir: "{{ steward_directory }}"
         cmd: 'poetry install --no-dev'
 
     - name: Copy caddy config

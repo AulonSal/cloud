@@ -5,7 +5,7 @@ After=network.target
 [Service]
 User=aulonsal
 Group=caddy
-WorkingDirectory=/home/aulonsal/steward-fastapi/steward_fastapi
+WorkingDirectory={{ steward_working_directory }}
 ExecStart=poetry run python run_prod.py
 
 [Install]

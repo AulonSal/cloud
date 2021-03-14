@@ -5,6 +5,9 @@ auxilliaries
 secrets.yaml
 secrets
 
+# Generated Files
+ansible/files
+
 # Development environments
 .vim
 
