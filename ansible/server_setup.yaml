@@ -1,0 +1,79 @@
+---
+- hosts: aws-setup
+  become: true
+  vars_files:
+    - vars/default.yaml
+    - vars/secrets.yaml
+
+  tasks:
+    - name: Install Packages
+      pacman: name={{ sys_packages }} state=latest
+
+# Sudo Group Setup
+    - name: Make sure we have a 'wheel' group
+      group:
+        name: wheel
+        state: present
+
+    - name: Allow 'wheel' group to have passwordless sudo
+      lineinfile:
+        path: /etc/sudoers
+        state: present
+        regexp: '^%wheel'
+        line: '%wheel ALL=(ALL) ALL'
+        insertafter: '## Uncomment to allow members of group wheel to execute any command'
+        validate: '/usr/sbin/visudo -cf %s'
+
+# User + Key Setup
+    - name: Create a new regular user with sudo privileges
+      user:
+        name: "{{ sudo_user }}"
+        state: present
+        groups: wheel
+        append: true
+        create_home: true
+        shell: /bin/zsh
+        password: "{{ sudo_user_password_hash }}"
+
+    - name: Have arch's shell be zsh
+      user:
+        name: "{{ initial_user }}"
+        state: present
+        shell: /bin/zsh
+
+    - name: Set authorized key for remote user
+      authorized_key:
+        user: "{{ sudo_user }}"
+        state: present
+        key: "{{ copy_local_key }}"
+
+    - name: Copy zshrc for all users
+      copy:
+        backup: yes
+        dest: "/home/{{ item }}/.zshrc"
+        src: 'configs/zshrc'
+        group: "{{ item }}"
+        owner: "{{ item }}"
+        mode:  0644
+      # loop: "{{ all_users }}"
+      # Try https://stackoverflow.com/questions/33343215/how-to-get-an-arbitrary-remote-users-home-directory-in-ansible
+      loop:
+        - "{{ sudo_user }}"
+        - "{{ initial_user }}"
+
+    - name: Copy kitty terminfo to remote system
+      copy:
+        dest: "{{ terminfo_dir }}"
+        src: '/usr/lib/kitty/terminfo/'
+        group: 'root'
+        owner: 'root'
+        mode:  'preserve'
+
+
+    # - name: Disable password authentication for root
+    #   lineinfile:
+    #     path: /etc/ssh/sshd_config
+    #     state: present
+    #     regexp: '^#?PermitRootLogin'
+    #     line: 'PermitRootLogin prohibit-password'
+

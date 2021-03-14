@@ -1,0 +1,35 @@
+---
+sudo_user: 'aulonsal'
+initial_user: 'arch'
+all_users: [
+        "{{ sudo_user }}",
+        "{{ initial_user }}",
+        'root',
+        ]
+
+# Found using infocmp -D
+terminfo_dir: '/usr/share/terminfo'
+
+# generated with python -c "import crypt; print(crypt.crypt('*password*'))"
+copy_local_key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
+
+sys_packages: [
+        'zsh',
+        'grml-zsh-config',
+        'base-devel',
+        'sudo',
+        'git',
+
+        'man-db',
+        'man-pages',
+        'texinfo',
+        'htop',
+
+        'fish',
+        'ranger',
+        'neovim',
+        'bat',
+        'ripgrep',
+        'skim',
+        'nmap',
+        ]

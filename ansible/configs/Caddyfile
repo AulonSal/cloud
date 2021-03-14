@@ -1,0 +1,11 @@
+{
+
+	# TLS Options
+	email aulonsal@gmail.com
+}
+
+steward.aulonsal.com {
+	reverse_proxy unix//home/aulonsal/steward-fastapi/web.sock
+	
+	encode zstd gzip
+}

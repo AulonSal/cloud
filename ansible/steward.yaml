@@ -1,0 +1,21 @@
+# Deployment of steward
+---
+- hosts: aws-deploy
+  become: true
+  vars_files:
+    - vars/steward.yaml
+
+  tasks:
+    - name: Install Packages
+      pacman: name={{ packages }} state=latest
+        
+    - name: Copy caddy config
+      copy:
+        backup: yes
+        dest: '/etc/caddy/Caddyfile'
+        src: 'configs/Caddyfile'
+        group: 'root'
+        owner: 'root'
+        mode:  0644
+        validate: 'caddy validate %s'
+
