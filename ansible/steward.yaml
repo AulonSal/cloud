@@ -34,7 +34,7 @@
       ansible.posix.synchronize:
         checksum: true
         dest: "{{ steward_working_directory }}"
-        src: 'configs/steward/'
+        src: "{{ files_directory }}/steward/'
       tags:
         - steward_setup
 
@@ -58,7 +58,7 @@
       ansible.builtin.copy:
         backup: yes
         dest: '/etc/caddy/Caddyfile'
-        src: 'configs/Caddyfile'
+        src: "{{ files_directory }}/Caddyfile"
         group: 'root'
         owner: 'root'
         mode:  0644
@@ -81,7 +81,7 @@
       ansible.posix.synchronize:
         checksum: true
         dest: '/etc/systemd/system'
-        src: 'configs/systemd/'
+        src: "{{ files_directory }}/systemd/"
       tags:
         - caddy
 
