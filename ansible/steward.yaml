@@ -17,6 +17,8 @@
         repo: "{{ git_uri }}"
         dest: '~/steward-fastapi'
         accept_hostkey: true
+      tags:
+        - steward_setup
 
     - name: Copy custom aerich to server
       ansible.builtin.copy:
@@ -25,6 +27,8 @@
         group: "{{ sudo_user }}"
         owner: "{{ sudo_user }}"
         mode:  'preserve'
+      tags:
+        - steward_setup
 
     - name: Copy steward prod only directory contents
       ansible.posix.synchronize:
@@ -46,6 +50,8 @@
       ansible.builtin.command:
         chdir: "{{ steward_directory }}"
         cmd: 'poetry install --no-dev'
+      tags:
+        - steward_setup
 
     - name: Copy caddy config
       become: true
@@ -56,6 +62,8 @@
         group: 'root'
         owner: 'root'
         mode:  0644
+      tags:
+        - caddy
 
     - name: Add caddy to group sudo_user
       become: true
@@ -64,6 +72,8 @@
         state: present
         groups: "{{ sudo_user }}"
         append: true
+      tags:
+        - caddy
 
     # In the future, create a systemd service to create a dir in run on boot for the application
     - name: Copy services
@@ -72,11 +82,15 @@
         checksum: true
         dest: '/etc/systemd/system'
         src: 'configs/systemd/'
+      tags:
+        - caddy
 
     - name: Reload systemd daemon
       become: true
       ansible.builtin.systemd:
         daemon_reload: true
+      tags:
+        - caddy
         
     - name: Enable webservers
       become: true
@@ -87,4 +101,6 @@
       loop:
         - 'caddy'
         - 'aulon-web'
+      tags:
+        - caddy
 
