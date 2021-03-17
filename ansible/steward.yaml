@@ -33,7 +33,7 @@
     - name: Copy steward prod only directory contents
       ansible.posix.synchronize:
         checksum: true
-        dest: "{{ steward_working_directory }}"
+        dest: "{{ steward_directory }}"
         src: "{{ files_directory }}/steward/'
       tags:
         - steward_setup
