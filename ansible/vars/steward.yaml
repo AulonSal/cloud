@@ -14,5 +14,5 @@ steward_socket_path: "{{ steward_directory }}/web.sock"
 
 # Local
 local_steward_directory: '/home/aulonsal/developer/projects/active/steward-fastapi'
-python_distributables_directory: "{{ local_project_directory }}/dist"
+python_distributables_directory: "{{ local_steward_directory }}/dist"
 
