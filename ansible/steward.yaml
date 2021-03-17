@@ -68,6 +68,13 @@
       tags:
         - refresh_database
 
+    - name: Create admin agent
+      ansible.builtin.command:
+        chdir: "{{ steward_setup_directory }}"
+        cmd: 'poetry run python create_admin_agent.py'
+      tags:
+       - refresh_database
+
     - name: Copy caddy config
       become: true
       ansible.builtin.copy:

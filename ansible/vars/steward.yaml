@@ -10,6 +10,7 @@ packages: [
 git_uri: 'git@github.com:AulonSal/steward-fastapi.git'
 steward_directory: '/home/aulonsal/steward-fastapi'
 steward_working_directory: "{{ steward_directory }}/steward_fastapi"
+steward_setup_directory: "{{ steward_directory }}/setup"
 steward_socket_path: "{{ steward_directory }}/web.sock"
 
 # Local
