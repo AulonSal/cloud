@@ -34,7 +34,7 @@
       ansible.posix.synchronize:
         checksum: true
         dest: "{{ steward_directory }}"
-        src: "{{ files_directory }}/steward/'
+        src: "{{ files_directory }}/steward/"
       tags:
         - steward_setup
 
@@ -52,6 +52,21 @@
         cmd: 'poetry install --no-dev'
       tags:
         - steward_setup
+
+    - name: Recreate Database
+      delegate_to: 'localhost'
+      ansible.builtin.command:
+        chdir: "{{ scripts_directory }}"
+        cmd: 'bash refresh_database.bash'
+      tags:
+        - refresh_database
+
+    - name: Update Database
+      ansible.builtin.command:
+        chdir: "{{ steward_working_directory }}"
+        cmd: 'poetry run aerich upgrade'
+      tags:
+        - refresh_database
 
     - name: Copy caddy config
       become: true

@@ -36,6 +36,7 @@ sys_packages: [
         ]
 
 ansible_directory: '/home/aulonsal/developer/deployments/active/cloud/ansible'
-files_directory: '{{ ansible_directory }}/files'
+files_directory: "{{ ansible_directory }}/files"
+scripts_directory: "{{ files_directory }}/scripts"
 templates_directory: "templates"
 
