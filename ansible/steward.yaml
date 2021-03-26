@@ -8,7 +8,7 @@
     - vars/secrets.yaml
 
   tasks:
-    - name: Install packages
+    - name: Install steward packages
       become: true
       pacman: name={{ packages }} state=latest
 
@@ -60,6 +60,7 @@
         cmd: 'bash refresh_database.bash'
       tags:
         - refresh_database
+        - never
 
     - name: Update Database
       ansible.builtin.command:
@@ -67,25 +68,24 @@
         cmd: 'poetry run aerich upgrade'
       tags:
         - refresh_database
+        - never
 
     - name: Create admin agent
       ansible.builtin.command:
         chdir: "{{ steward_setup_directory }}"
         cmd: 'poetry run python create_admin_agent.py'
       tags:
-       - refresh_database
+        - refresh_database
+        - never
 
-    - name: Copy caddy config
+
+    - name: Copy root configs
       become: true
-      ansible.builtin.copy:
-        backup: yes
-        dest: '/etc/caddy/Caddyfile'
-        src: "{{ files_directory }}/Caddyfile"
-        group: 'root'
-        owner: 'root'
-        mode:  0644
-      tags:
-        - caddy
+      ansible.posix.synchronize:
+        checksum: true
+        dest: '/etc'
+        src: "{{ etc_templates_directory }}/"
+      register: root_configs
 
     - name: Add caddy to group sudo_user
       become: true
@@ -98,31 +98,30 @@
         - caddy
 
     # In the future, create a systemd service to create a dir in run on boot for the application
-    - name: Copy services
-      become: true
-      ansible.posix.synchronize:
-        checksum: true
-        dest: '/etc/systemd/system'
-        src: "{{ files_directory }}/systemd/"
-      tags:
-        - caddy
+    # - name: Copy services
+    #   become: true
+    #   ansible.posix.synchronize:
+    #     checksum: true
+    #     dest: '/etc/systemd/system'
+    #     src: "{{ files_directory }}/systemd/"
+    #   tags:
+    #     - configs.changed
+    #   register: services
 
     - name: Reload systemd daemon
       become: true
       ansible.builtin.systemd:
         daemon_reload: true
-      tags:
-        - caddy
-        
+      when: root_configs.changed
+
     - name: Enable webservers
       become: true
       ansible.builtin.systemd:
         name: "{{ item }}"
-        state: restarted
+        state: started
         enabled: yes
       loop:
         - 'caddy'
         - 'aulon-web'
-      tags:
-        - caddy
+      when: root_configs.changed
 
