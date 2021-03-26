@@ -19,8 +19,8 @@
         src: "{{ item.src }}"
         dest: "{{ files_directory }}/{{ item.path }}"
         mode: '{{ item.mode }}'
-      # This command doesn't work without the trailing slash but the one in the first task does, except
-      # for that one time that it didn't, go figure *shrugs*
+        # This command doesn't work without the trailing slash but the one in the first task does, except
+        # for that one time that it didn't, go figure *shrugs*
       with_community.general.filetree: "{{ templates_directory }}/"
       when: item.state == 'file'
-          
+

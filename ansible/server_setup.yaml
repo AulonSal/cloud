@@ -9,6 +9,7 @@
     - vars/steward.yaml
 
   tasks:
+    # Basic Setup
     - name: Set timezone
       community.general.timezone:
         name: "{{ timezone }}"
@@ -28,7 +29,7 @@
         name: "{{ sys_packages }}"
         state: latest
 
-# Sudo Group Setup
+    # User Setup
     - name: Make sure we have a 'wheel' group
       group:
         name: wheel
@@ -44,7 +45,6 @@
         insertafter: '## Uncomment to allow members of group wheel to execute any command'
         validate: '/usr/sbin/visudo -cf %s'
 
-# User + Key Setup
     - name: Create a new regular user with sudo privileges
       user:
         name: "{{ sudo_user }}"
@@ -53,7 +53,6 @@
         append: true
         create_home: true
         shell: /bin/zsh
-        password: "{{ sudo_user_password_hash }}"
 
     - name: Allow groups to execute in home directory
       ansible.builtin.file:
@@ -73,16 +72,16 @@
         state: present
         key: "{{ copy_local_key }}"
 
-    - name: Copy zshrc for all users
+    - name: Copy zshrc for all non-root users
       ansible.builtin.copy:
         backup: yes
         dest: "/home/{{ item }}/.zshrc"
-        src: 'configs/zshrc'
+        src: "{{ files_directory }}/zshrc"
         group: "{{ item }}"
         owner: "{{ item }}"
         mode:  0644
-      # loop: "{{ all_users }}"
-      # Try https://stackoverflow.com/questions/33343215/how-to-get-an-arbitrary-remote-users-home-directory-in-ansible
+        # loop: "{{ all_users }}"
+        # Try https://stackoverflow.com/questions/33343215/how-to-get-an-arbitrary-remote-users-home-directory-in-ansible
       loop:
         - "{{ sudo_user }}"
         - "{{ initial_user }}"
@@ -90,14 +89,14 @@
     - name: Copy gitconfig
       ansible.builtin.copy:
         dest: "/home/{{ sudo_user }}/.gitconfig"
-        src: 'configs/gitconfig'
+        src: "{{ files_directory }}/gitconfig"
         group: "{{ sudo_user }}"
         owner: "{{ sudo_user }}"
         mode:  0644
 
     - name: Copy kitty terminfo to server
       ansible.builtin.copy:
-        dest: "{{ terminfo_dir }}"
+        dest: "{{ terminfo_directory }}"
         src: '/usr/lib/kitty/terminfo/'
         group: 'root'
         owner: 'root'
