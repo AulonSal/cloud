@@ -25,6 +25,7 @@ sys_packages: [
         'texinfo',
         'htop',
         'sqlite',
+        'caddy',
 
         'fish',
         'ranger',
