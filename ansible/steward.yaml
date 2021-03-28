@@ -119,7 +119,6 @@
         - 'caddy'
         - 'aulon-web'
         - 'steward-discord'
-      when: root_configs.changed
       tags:
         - configs
 
