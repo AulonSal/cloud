@@ -100,17 +100,7 @@
       tags:
         - caddy
 
-    # In the future, create a systemd service to create a dir in run on boot for the application
-    # - name: Copy services
-    #   become: true
-    #   ansible.posix.synchronize:
-    #     checksum: true
-    #     dest: '/etc/systemd/system'
-    #     src: "{{ files_directory }}/systemd/"
-    #   tags:
-    #     - configs.changed
-    #   register: services
-
+    # TODO:Create a systemd service to create a dir in run on boot for the application
     - name: Reload systemd daemon
       become: true
       ansible.builtin.systemd:
