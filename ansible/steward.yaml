@@ -15,6 +15,7 @@
     - name: Checkout steward
       ansible.builtin.git:
         repo: "{{ git_uri }}"
+        version: 'dev'
         dest: '~/steward-fastapi'
         accept_hostkey: true
       tags:
@@ -61,6 +62,7 @@
       tags:
         - refresh_database
         - never
+      register: recreate_database
 
     - name: Update Database
       ansible.builtin.command:
@@ -84,8 +86,10 @@
       ansible.posix.synchronize:
         checksum: true
         dest: '/etc'
-        src: "{{ etc_templates_directory }}/"
+        src: "{{ files_directory }}/etc/"
       register: root_configs
+      tags:
+        - configs
 
     - name: Add caddy to group sudo_user
       become: true
@@ -113,6 +117,8 @@
       ansible.builtin.systemd:
         daemon_reload: true
       when: root_configs.changed
+      tags:
+        - configs
 
     - name: Enable webservers
       become: true
@@ -124,4 +130,6 @@
         - 'caddy'
         - 'aulon-web'
       when: root_configs.changed
+      tags:
+        - configs
 
