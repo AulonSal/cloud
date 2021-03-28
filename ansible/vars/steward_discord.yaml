@@ -1,0 +1,16 @@
+---
+packages: [
+        'poetry',
+        ]
+
+# TODO: Figure out how namespaces work
+
+# Paths
+# Remote
+steward_discord_git_uri: 'git@github.com:AulonSal/steward-discord.git'
+steward_discord_directory: '/home/aulonsal/steward-discord'
+steward_discord_working_directory: "{{ steward_discord_directory }}/steward_discord"
+
+# Local
+local_steward_discord_directory: '/home/aulonsal/developer/projects/active/steward-discord'
+

@@ -5,6 +5,7 @@
     - vars/default.yaml
     - vars/secrets.yaml
     - vars/steward.yaml
+    - vars/steward_discord.yaml
 
   tasks:
     - name: Ensure files directory structure exists

@@ -1,0 +1,11 @@
+[Unit]
+Description=Steward Discord Bot
+After=network.target
+
+[Service]
+User=aulonsal
+WorkingDirectory={{ steward_discord_working_directory }}
+ExecStart=poetry run python bot.py
+
+[Install]
+WantedBy=multi-user.target

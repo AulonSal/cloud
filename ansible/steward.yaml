@@ -80,7 +80,6 @@
         - refresh_database
         - never
 
-
     - name: Copy root configs
       become: true
       ansible.posix.synchronize:
@@ -129,6 +128,7 @@
       loop:
         - 'caddy'
         - 'aulon-web'
+        - 'steward-discord'
       when: root_configs.changed
       tags:
         - configs

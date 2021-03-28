@@ -1,0 +1,39 @@
+# Deployment of steward
+---
+- hosts: aws-deploy
+  become: false
+  vars_files:
+    - vars/default.yaml
+    - vars/steward_discord.yaml
+    - vars/secrets.yaml
+
+# TODO: Pull Caddy and system services out to their own role or whatever
+  tasks:
+    - name: Install steward packages
+      become: true
+      pacman: name={{ packages }} state=latest
+
+    - name: Checkout steward
+      ansible.builtin.git:
+        repo: "{{ steward_discord_git_uri }}"
+        version: 'dev'
+        dest: "{{ steward_discord_directory }}"
+        accept_hostkey: true
+      tags:
+        - steward_discord
+
+    - name: Copy steward prod only directory contents
+      ansible.posix.synchronize:
+        checksum: true
+        dest: "{{ steward_discord_directory }}"
+        src: "{{ files_directory }}/steward-discord/"
+      tags:
+        - steward_discord
+
+    - name: Install poetry environment
+      ansible.builtin.command:
+        chdir: "{{ steward_discord_directory }}"
+        cmd: 'poetry install --no-dev'
+      tags:
+        - steward_discord
+
