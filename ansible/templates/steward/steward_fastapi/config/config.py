@@ -11,3 +11,5 @@ POSTGRES_CREDENTIALS = {
                     'port': {{ steward_db_port }},
                 }
 
+JWT_SECRET_KEY = "{{ steward_jwt_secret_key }}"
+
